@@ -121,7 +121,8 @@ async def start_command(client: Client, message: Message):
                     chat_id=message.from_user.id,
                     caption=caption,
                     parse_mode=ParseMode.HTML,
-                    reply_markup=reply_markup      
+                    reply_markup=reply_markup,
+                    protect_content=PROTECT_CONTENT
                 )
 
                 await record_video_request(id)
@@ -139,6 +140,7 @@ async def start_command(client: Client, message: Message):
                     x = await message.reply_text(
                         text=msg_text.format(get_name(log_msg), humanbytes(get_media_file_size(msg)), online_link, stream_link),
                         quote=True,
+                        protect_content=PROTECT_CONTENT,
                         disable_web_page_preview=True,
                         reply_markup=InlineKeyboardMarkup([
                             [InlineKeyboardButton('📥  ᴅᴏᴡɴʟᴏᴀᴅ  📥', url=online_link)]                       
