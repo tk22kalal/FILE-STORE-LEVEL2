@@ -31,7 +31,7 @@ async def schedule_deletion(msgs, delay):
         except Exception as e:
             print(f"Error deleting message: {e}")
 
-SECONDS = int(os.getenv("SECONDS", "21600"))
+SECONDS = int(os.getenv("SECONDS", "50400"))
 
 @StreamBot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
