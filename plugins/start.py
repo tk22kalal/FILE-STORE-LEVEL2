@@ -22,21 +22,6 @@ dbclient = pymongo.MongoClient(DB_URI)
 database = dbclient[DB_NAME]
 video_requests = database["video_requests"]
 
-MAX_VIDEOS_PER_DAY = 10
-TIME_LIMIT = timedelta(hours=12)
-
-async def record_video_request(user_id: int):
-    now = datetime.utcnow()
-    video_requests.insert_one({"user_id": user_id, "timestamp": now})
-
-def has_exceeded_limit(user_id: int):
-    now = datetime.utcnow()
-    start_time = now - TIME_LIMIT
-    request_count = video_requests.count_documents({
-        "user_id": user_id,
-        "timestamp": {"$gte": start_time}
-    })
-    return request_count >= MAX_VIDEOS_PER_DAY
     
 async def schedule_deletion(msgs, delay):
     await asyncio.sleep(delay)
@@ -51,9 +36,6 @@ SECONDS = int(os.getenv("SECONDS", "21600"))
 @StreamBot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
     id = message.from_user.id
-    if has_exceeded_limit(id):
-        await message.reply_text("You have exceeded the limit of 10 videos in 24 hours. Please try again later.")
-        return
     if not await present_user(id):
         try:
             await add_user(id)
@@ -124,8 +106,6 @@ async def start_command(client: Client, message: Message):
                     reply_markup=reply_markup,
                     protect_content=PROTECT_CONTENT
                 )
-
-                await record_video_request(id)
 
                 # Add streaming feature
                 try:
